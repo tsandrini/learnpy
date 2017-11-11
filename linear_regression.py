@@ -15,12 +15,12 @@ from python_ml.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 
 
-def get_dataset(pcs, interval, step=2, correlation=False):
+def get_dataset(pcs, interval, features=1, step=2, correlation=False):
     i = 1
     X = []
     y = []
     for j in range(pcs):
-        X.append(j)
+        X.append([random.randrange(j, j * (k + 1) + 1) for k in range(features)])
         y.append(i + random.randrange(-interval, interval))
         if correlation and correlation == True:
             i += step
@@ -34,19 +34,21 @@ def first_example():
     style.use('fivethirtyeight')
     iterations = 1000
     learning_rate = 0.0001
-    X, y = get_dataset(1000, 1000, 8, True)
+    X, y = get_dataset(1000, 1000, 7, 8, True)
+    print(X)
     pcs = math.ceil(0.8 * len(y))
     X_train, y_train, X_test, y_test = X[:pcs], y[:pcs], X[pcs:], y[pcs:]
 
-    clf = LinearRegression(iterations, learning_rate)
-    loss = clf.fit(X_train, y_train)
+    clf = LinearRegression(method='matrix')
+    # clf = LinearRegression(method='gradient_descent', learning_rate=learning_rate, iterations=iterations)
+    clf.fit(X_train, y_train)
     print(clf.score(X_test, y_test))
 
-    plt.plot(np.arange(iterations), loss)
-    plt.xlabel("Iterations")
-    plt.ylabel("Cost function")
-    # plt.scatter(X_train, y_train, color='brown')
-    plt.show()
+    # plt.plot(np.arange(iterations), loss)
+    # plt.xlabel("Iterations")
+    # plt.ylabel("Cost function")
+    # # plt.scatter(X_train, y_train, color='brown')
+    # plt.show()
 
 def second_example():
     df = quandl.get('WIKI/GOOGL')
@@ -70,17 +72,18 @@ def second_example():
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
     iterations = 1000
-    learning_rate = 0.5
+    learning_rate = 10
 
-    clf = LinearRegression(iterations, learning_rate)
     style.use('fivethirtyeight')
-    loss = clf.fit(X_train, y_train)
+    # clf = LinearRegression(method='matrix')
+    clf = LinearRegression(method='gradient_descent', iterations=iterations, learning_rate=learning_rate)
+    clf.fit(X_train, y_train)
     print(clf.score(X_test, y_test))
 
-    plt.plot(np.arange(iterations), loss)
-    plt.xlabel("Iterations")
-    plt.ylabel("Cost function")
-    plt.show()
+    # plt.plot(np.arange(iterations), loss)
+    # plt.xlabel("Iterations")
+    # plt.ylabel("Cost function")
+    # plt.show()
 
 if __name__ == '__main__':
     second_example()
