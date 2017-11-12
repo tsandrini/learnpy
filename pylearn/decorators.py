@@ -14,40 +14,29 @@ Created by Tomáš Sandrini
 """
 
 
-import setuptools
+import time
+import functools
 
 
-try:
-    import pylearn
-except (ImportError, SyntaxError):
-    print("error: PyLearn requires Python 3.5 or greater.")
-    quit(1)
+def time_usage(func):
+    """
+    Prints time usage of a given function
+    """
+    def wrapper(*args, **kwargs):
+        beg_ts = time.time()
+        retval = func(*args, **kwargs)
+        end_ts = time.time()
+        print("elapsed time: %f" % (end_ts - beg_ts))
+        return retval
+    return wrapper
 
-
-
-VERSION = pylearn.__version__
-DOWNLOAD = "https://github.com/tsandrini/pylearn/archive/%s.tar.gz" % VERSION
-
-
-setuptools.setup(
-    name="PyLearn",
-    version=VERSION,
-    author="Tomáš Sandrini",
-    author_email="tomas.sandrini@seznam.cz",
-    description="Implementation of popular ML algs in python",
-    long_description="Implementation of popular ML algs in python",
-    license="MIT",
-    url="https://github.com/tsandrini/pylearn",
-    download_url=DOWNLOAD,
-    classifiers=[
-        "Environment :: X11 Applications",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: POSIX :: Linux",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
-    ],
-    packages=["pylearn"],
-    python_requires=">=3.5",
-    test_suite="tests",
-    include_package_data=True
-)
+def trackcalls(func):
+    """
+    Checks whether a function has been called
+    """
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        wrapper.has_been_called = True
+        return func(*args, **kwargs)
+    wrapper.has_been_called = False
+    return wrapper

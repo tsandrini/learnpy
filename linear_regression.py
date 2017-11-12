@@ -1,4 +1,18 @@
 #!/bin/env python3
+"""
+      ___           ___           ___       ___           ___           ___           ___
+     /\  \         |\__\         /\__\     /\  \         /\  \         /\  \         /\__\
+    /::\  \        |:|  |       /:/  /    /::\  \       /::\  \       /::\  \       /::|  |
+   /:/\:\  \       |:|  |      /:/  /    /:/\:\  \     /:/\:\  \     /:/\:\  \     /:|:|  |
+  /::\~\:\  \      |:|__|__   /:/  /    /::\~\:\  \   /::\~\:\  \   /::\~\:\  \   /:/|:|  |__
+ /:/\:\ \:\__\     /::::\__\ /:/__/    /:/\:\ \:\__\ /:/\:\ \:\__\ /:/\:\ \:\__\ /:/ |:| /\__\
+ \/__\:\/:/  /    /:/~~/~    \:\  \    \:\~\:\ \/__/ \/__\:\/:/  / \/_|::\/:/  / \/__|:|/:/  /
+      \::/  /    /:/  /       \:\  \    \:\ \:\__\        \::/  /     |:|::/  /      |:/:/  /
+       \/__/     \/__/         \:\  \    \:\ \/__/        /:/  /      |:|\/__/       |::/  /
+                                \:\__\    \:\__\         /:/  /       |:|  |         /:/  /
+                                 \/__/     \/__/         \/__/         \|__|         \/__/
+Created by Tomáš Sandrini
+"""
 
 
 import random
@@ -11,7 +25,7 @@ import matplotlib.pyplot as plt
 
 from matplotlib import style
 from sklearn import preprocessing
-from python_ml.linear_model import LinearRegression
+from pylearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 
 

@@ -14,40 +14,13 @@ Created by Tomáš Sandrini
 """
 
 
-import setuptools
+import os
+import platform
 
 
-try:
-    import pylearn
-except (ImportError, SyntaxError):
-    print("error: PyLearn requires Python 3.5 or greater.")
-    quit(1)
+__version__ = '0.1.0'
 
 
-
-VERSION = pylearn.__version__
-DOWNLOAD = "https://github.com/tsandrini/pylearn/archive/%s.tar.gz" % VERSION
-
-
-setuptools.setup(
-    name="PyLearn",
-    version=VERSION,
-    author="Tomáš Sandrini",
-    author_email="tomas.sandrini@seznam.cz",
-    description="Implementation of popular ML algs in python",
-    long_description="Implementation of popular ML algs in python",
-    license="MIT",
-    url="https://github.com/tsandrini/pylearn",
-    download_url=DOWNLOAD,
-    classifiers=[
-        "Environment :: X11 Applications",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: POSIX :: Linux",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
-    ],
-    packages=["pylearn"],
-    python_requires=">=3.5",
-    test_suite="tests",
-    include_package_data=True
-)
+HOME = os.getenv('HOME', os.getenv('USERPROFILE'))
+MODULE_DIR = os.path.dirname(__file__)
+OS = platform.uname()[0]
