@@ -1,15 +1,13 @@
 """
-      ___           ___           ___       ___           ___           ___           ___
-     /\  \         |\__\         /\__\     /\  \         /\  \         /\  \         /\__\
-    /::\  \        |:|  |       /:/  /    /::\  \       /::\  \       /::\  \       /::|  |
-   /:/\:\  \       |:|  |      /:/  /    /:/\:\  \     /:/\:\  \     /:/\:\  \     /:|:|  |
-  /::\~\:\  \      |:|__|__   /:/  /    /::\~\:\  \   /::\~\:\  \   /::\~\:\  \   /:/|:|  |__
- /:/\:\ \:\__\     /::::\__\ /:/__/    /:/\:\ \:\__\ /:/\:\ \:\__\ /:/\:\ \:\__\ /:/ |:| /\__\
- \/__\:\/:/  /    /:/~~/~    \:\  \    \:\~\:\ \/__/ \/__\:\/:/  / \/_|::\/:/  / \/__|:|/:/  /
-      \::/  /    /:/  /       \:\  \    \:\ \:\__\        \::/  /     |:|::/  /      |:/:/  /
-       \/__/     \/__/         \:\  \    \:\ \/__/        /:/  /      |:|\/__/       |::/  /
-                                \:\__\    \:\__\         /:/  /       |:|  |         /:/  /
-                                 \/__/     \/__/         \/__/         \|__|         \/__/
+ __                                       ____
+/\ \                                     /\  _`\
+\ \ \         __      __     _ __    ___ \ \ \L\ \ __  __
+ \ \ \  __  /'__`\  /'__`\  /\`'__\/' _ `\\ \ ,__//\ \/\ \
+  \ \ \L\ \/\  __/ /\ \L\.\_\ \ \/ /\ \/\ \\ \ \/ \ \ \_\ \
+   \ \____/\ \____\\ \__/.\_\\ \_\ \ \_\ \_\\ \_\  \/`____ \
+    \/___/  \/____/ \/__/\/_/ \/_/  \/_/\/_/ \/_/   `/___/> \
+                                                       /\___/
+                                                       \/__/
 Created by Tomáš Sandrini
 """
 
@@ -31,15 +29,19 @@ class LinearRegression():
         - matrix
         - gradient_descent
 
-    iterations: integer optional
+    max_iterations: integer optional default 100
         needed only while using Gradient Descent method
         determines how many times should be the gradient
-        stepped
+        stepped while still not converging
 
     learning_rate: float optional
         needed only while using Gradient Descent method
         determines how much should be the coefficients
         changed every iteration
+
+    tolerance: float optional default 0.0001
+        needed only while using Gradient Descent method
+        used to determine whether a given coefficient converges
 
     Attributes
     ----------
@@ -58,10 +60,11 @@ class LinearRegression():
         if method in set(['gradient', 'gradient_descent', 'descent']):
             try:
                 self.method = 'gradient_descent'
-                self.iterations = kwargs['iterations']
                 self.learning_rate = kwargs['learning_rate']
+                self.max_iterations = kwargs['max_iterations'] if 'max_iterations' in kwargs else 100
+                self.tolerance = kwargs['tolerance'] if 'tolerance' in kwargs else 0.0001
             except KeyError as e:
-                print("While using the Gradient Descent method you have to specify 'iterations' and 'learning_rate'")
+                print("While using the Gradient Descent method you have to specify 'learning_rate'")
         else:
             self.method = 'matrix'
 
@@ -74,7 +77,7 @@ class LinearRegression():
         X : numpy array or sparse matrix of shape [n_samples,n_features]
             Training data
 
-        y : numpy array of shape [n_samples, n_targets]
+        y : numpy array of shape [n_samples,]
             Target values. Will be cast to X's dtype if necessary
 
         Returns
@@ -86,7 +89,7 @@ class LinearRegression():
         if self.method == 'matrix':
             self.coefs = compute_coefs_by_matrix_multiplication(X, y)
         elif self.method == 'gradient_descent':
-            self.coefs = gradient_descent(X, y, self.coefs, self.iterations, self.learning_rate)
+            self.coefs = gradient_descent(X, y, self.coefs, self.max_iterations, self.tolerance, self.learning_rate)
 
         return self
 
@@ -108,6 +111,30 @@ class LinearRegression():
         return np.dot(X, self.coefs)
 
     def score(self, X, y):
+        """
+        Returns the coefficient of determination R^2 of the prediction.
+
+        The coefficient R^2 is defined as (1 - u/v), where u is the
+        residual sum of squares ((y_true - y_pred) ** 2).sum() and
+        v is the total sum of squares ((y_true - y_true.mean()) ** 2).sum().
+        The best possible score is 1.0 and it can be negative
+        (because the model can be arbitrarily worse). A constant model
+        that always predicts the expected value of y, disregarding
+        the input features, would get a R^2 score of 0.0.
+
+        Parameters
+        ----------
+        X : numpy array or sparse matrix of shape [n_samples,n_features]
+            Test samples
+
+        y : numpy array of shape [n_samples]
+            True values for given test samples
+
+        Returns
+        -------
+        score : float
+            R^2 of self.predict(X) wrt. y.
+        """
         X = self.validate_X(X)
         return coefficient_of_determination(y, self.predict(X))
 
@@ -144,12 +171,17 @@ def step_gradient(X, y, coefs, learning_rate):
 
     return coefs_out
 
-def gradient_descent(X, y, coefs, iterations, learning_rate):
+def gradient_descent(X, y, coefs, max_iterations, tolerance, learning_rate):
     if not coefs:
         coefs = np.zeros(X.shape[1])
 
-    for i in range(iterations):
+    for i in range(max_iterations):
+        last_coefs = coefs
         coefs = step_gradient(X, y, coefs, learning_rate)
+
+        # Break if gradient converges with respect to the given tolerance
+        if np.abs(np.mean([last_coefs[i] - coefs[i] for i in range(len(coefs))])) <= tolerance:
+            break
 
     return coefs
 

@@ -1,1 +1,1 @@
-# PyLearn
+# LearnPy

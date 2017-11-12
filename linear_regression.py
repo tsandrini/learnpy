@@ -1,16 +1,14 @@
 #!/bin/env python3
 """
-      ___           ___           ___       ___           ___           ___           ___
-     /\  \         |\__\         /\__\     /\  \         /\  \         /\  \         /\__\
-    /::\  \        |:|  |       /:/  /    /::\  \       /::\  \       /::\  \       /::|  |
-   /:/\:\  \       |:|  |      /:/  /    /:/\:\  \     /:/\:\  \     /:/\:\  \     /:|:|  |
-  /::\~\:\  \      |:|__|__   /:/  /    /::\~\:\  \   /::\~\:\  \   /::\~\:\  \   /:/|:|  |__
- /:/\:\ \:\__\     /::::\__\ /:/__/    /:/\:\ \:\__\ /:/\:\ \:\__\ /:/\:\ \:\__\ /:/ |:| /\__\
- \/__\:\/:/  /    /:/~~/~    \:\  \    \:\~\:\ \/__/ \/__\:\/:/  / \/_|::\/:/  / \/__|:|/:/  /
-      \::/  /    /:/  /       \:\  \    \:\ \:\__\        \::/  /     |:|::/  /      |:/:/  /
-       \/__/     \/__/         \:\  \    \:\ \/__/        /:/  /      |:|\/__/       |::/  /
-                                \:\__\    \:\__\         /:/  /       |:|  |         /:/  /
-                                 \/__/     \/__/         \/__/         \|__|         \/__/
+ __                                       ____
+/\ \                                     /\  _`\
+\ \ \         __      __     _ __    ___ \ \ \L\ \ __  __
+ \ \ \  __  /'__`\  /'__`\  /\`'__\/' _ `\\ \ ,__//\ \/\ \
+  \ \ \L\ \/\  __/ /\ \L\.\_\ \ \/ /\ \/\ \\ \ \/ \ \ \_\ \
+   \ \____/\ \____\\ \__/.\_\\ \_\ \ \_\ \_\\ \_\  \/`____ \
+    \/___/  \/____/ \/__/\/_/ \/_/  \/_/\/_/ \/_/   `/___/> \
+                                                       /\___/
+                                                       \/__/
 Created by Tomáš Sandrini
 """
 
@@ -45,20 +43,20 @@ def get_dataset(pcs, interval, features=1, step=2, correlation=False):
 
 
 def first_example():
+    random.seed(0)
     style.use('fivethirtyeight')
-    iterations = 1000
+    max_iterations = 1000
     learning_rate = 0.0001
-    X, y = get_dataset(1000, 1000, 7, 8, True)
-    print(X)
+    X, y = get_dataset(1000, 1000, 1, 8, True)
     pcs = math.ceil(0.8 * len(y))
     X_train, y_train, X_test, y_test = X[:pcs], y[:pcs], X[pcs:], y[pcs:]
 
-    clf = LinearRegression(method='matrix')
-    # clf = LinearRegression(method='gradient_descent', learning_rate=learning_rate, iterations=iterations)
+    #clf = LinearRegression(method='matrix')
+    clf = LinearRegression(method='gradient_descent', learning_rate=learning_rate, max_iterations=max_iterations)
     clf.fit(X_train, y_train)
     print(clf.score(X_test, y_test))
 
-    # plt.plot(np.arange(iterations), loss)
+    # plt.plot(np.arange(max_iterations), loss)
     # plt.xlabel("Iterations")
     # plt.ylabel("Cost function")
     # # plt.scatter(X_train, y_train, color='brown')
@@ -85,19 +83,19 @@ def second_example():
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
-    iterations = 1000
+    max_iterations = 1000
     learning_rate = 10
 
     style.use('fivethirtyeight')
     # clf = LinearRegression(method='matrix')
-    clf = LinearRegression(method='gradient_descent', iterations=iterations, learning_rate=learning_rate)
+    clf = LinearRegression(method='gradient_descent', max_iterations=max_iterations, learning_rate=learning_rate)
     clf.fit(X_train, y_train)
     print(clf.score(X_test, y_test))
 
-    # plt.plot(np.arange(iterations), loss)
+    # plt.plot(np.arange(max_iterations), loss)
     # plt.xlabel("Iterations")
     # plt.ylabel("Cost function")
     # plt.show()
 
 if __name__ == '__main__':
-    second_example()
+    first_example()
