@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 
 from matplotlib import style
 from sklearn import preprocessing
-from pylearn.linear_model import LinearRegression
+from learnpy.models.linear_model import LinearRegression, LinearRegressionGD
 from sklearn.model_selection import train_test_split
 
 
@@ -43,18 +43,28 @@ def get_dataset(pcs, interval, features=1, step=2, correlation=False):
 
 
 def first_example():
-    random.seed(0)
     style.use('fivethirtyeight')
-    max_iterations = 1000
-    learning_rate = 0.0001
-    X, y = get_dataset(1000, 1000, 1, 8, True)
+    X, y = get_dataset(1000, 500, 7, 3, True)
     pcs = math.ceil(0.8 * len(y))
+    X = preprocessing.scale(X)
     X_train, y_train, X_test, y_test = X[:pcs], y[:pcs], X[pcs:], y[pcs:]
 
-    #clf = LinearRegression(method='matrix')
-    clf = LinearRegression(method='gradient_descent', learning_rate=learning_rate, max_iterations=max_iterations)
+    iterations = 1000
+    learning_rate = 0.01
+    tolerance = 0.0001
+
+
+    style.use('fivethirtyeight')
+    clf = LinearRegression()
     clf.fit(X_train, y_train)
-    print(clf.score(X_test, y_test))
+    print("Classic LinerRegression score: {0}".format(clf.score(X_test, y_test)))
+    print(clf.coefs)
+
+    clf = LinearRegressionGD(learning_rate=learning_rate, iterations=iterations, tolerance=tolerance)
+    clf.fit(X_train, y_train)
+    print("LinerRegressionGD score: {0}".format(clf.score(X_test, y_test)))
+    print(clf.coefs)
+
 
     # plt.plot(np.arange(max_iterations), loss)
     # plt.xlabel("Iterations")
@@ -83,14 +93,21 @@ def second_example():
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
-    max_iterations = 1000
-    learning_rate = 10
+    iterations = 1000
+    learning_rate = 0.001
+    tolerance = 0.0001
+
 
     style.use('fivethirtyeight')
-    # clf = LinearRegression(method='matrix')
-    clf = LinearRegression(method='gradient_descent', max_iterations=max_iterations, learning_rate=learning_rate)
+    clf = LinearRegression()
     clf.fit(X_train, y_train)
-    print(clf.score(X_test, y_test))
+    print("Classic LinerRegression score: {0}".format(clf.score(X_test, y_test)))
+    print(clf.coefs)
+
+    clf = LinearRegressionGD(learning_rate=learning_rate, iterations=iterations, tolerance=tolerance)
+    clf.fit(X_train, y_train)
+    print("LinerRegressionGD score: {0}".format(clf.score(X_test, y_test)))
+    print(clf.coefs)
 
     # plt.plot(np.arange(max_iterations), loss)
     # plt.xlabel("Iterations")
