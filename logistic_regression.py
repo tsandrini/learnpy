@@ -21,14 +21,10 @@ from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression as SKLogisticRegression
 
-from learnpy.models.linear_model import LogisticRegression
+from learnpy.models.linear_model import LogisticRegression, LogisticRegressionGD
 
 
 def first_example():
-    iterations = 1000
-    learning_rate = 0.001
-    tolerance = 1e-8
-
     min_max_scaler = preprocessing.MinMaxScaler(feature_range=(-1,1))
     df = pd.read_csv('data.csv', header=0)
     df.columns = ['grade1', 'grade2', 'label']
@@ -42,19 +38,38 @@ def first_example():
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
-    clf = LogisticRegression(learning_rate=learning_rate, iterations=iterations, tolerance=tolerance)
+    clf = LogisticRegressionGD(
+        learning_rate=0.005,
+        iterations=100,
+        tolerance=1e-5,
+        fit_intercept=False
+    )
     clf.fit(X_train, y_train)
+    print("Logistic regression with Gradient descent optimalization:")
+    print("Score: {0}".format(clf.score(X_test, y_test)))
     print(clf.coefs)
-    print(clf.score(X_test, y_test))
+    print("-----")
 
-    skclf = SKLogisticRegression()
-    skclf.fit(X_train, y_train)
-    print(skclf.coef_)
-    print(skclf.score(X_test, y_test))
+    clf = SKLogisticRegression()
+    clf.fit(X_train, y_train)
+    print("SKlearn logistic regression")
+    print("Score: {0}".format(clf.score(X_test, y_test)))
+    print(clf.coef_)
+    print("-----")
 
-    plt.scatter(X_train[:, 0], X_train[:, 1], c=y_train, alpha=.4)
-    plt.plot(np.dot(X_test, clf.coefs), clf.predict(X_test))
-    plt.show()
+    clf = LogisticRegression(
+        penalty='l2',
+        learning_rate=0.001,
+        iterations=15,
+        tolerance=1e-10,
+        fit_intercept=False
+    )
+    clf.fit(X_train, y_train)
+    print("Logistic regression with Newton's optimalization:")
+    print("Score: {0}".format(clf.score(X_test, y_test)))
+    print(clf.coefs)
+    print("-----")
+
 
 def second_example():
     np.random.seed(12)
@@ -86,10 +101,6 @@ def second_example():
     print(skclf.score(X_test, y_test))
     print(skclf.coef_)
 
-    plt.figure(figsize=(12, 8))
-    # plt.scatter(X_train[:, 0], X_train[:, 1], c=y_train, alpha=.4)
-    plt.scatter(X_test, clf.predict(X_test))
-    plt.show()
 
 
 if __name__ == '__main__':

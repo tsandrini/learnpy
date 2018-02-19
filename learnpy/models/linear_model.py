@@ -16,7 +16,6 @@ import numpy as np
 
 from numpy.linalg import inv
 from learnpy.support import Model
-from learnpy.runners import GradientDescentRunner
 from learnpy.functions import coefficient_of_determination, sigmoid
 
 
@@ -68,7 +67,7 @@ class LinearRegressionGD(LinearRegression, LinearMixin, Model):
         if sample_weights:
             coefs = sample_weights
         elif not self.coefs:
-            coefs = np.zeros(X.shape[1])
+            coefs = np.zeros(X.shape[1], 1)
         else:
             coefs = self.coefs
 
@@ -90,19 +89,17 @@ class LinearRegressionGD(LinearRegression, LinearMixin, Model):
 
         return self
 
-class LogisticRegression(Model):
+class LogisticRegressionGD(LinearMixin, Model):
 
     def __init__(self, learning_rate=0.001, iterations=100, tolerance=0.0001, fit_intercept=False, sample_weights=None):
         self.learning_rate = learning_rate
         self.iterations = iterations
         self.tolerance = tolerance
-        self.add_intercept = add_intercept
+        self.fit_intercept = fit_intercept
         self.coefs = sample_weights
 
     def fit(self, X, y, sample_weights=None):
-        if self.add_intercept:
-            intercept = np.ones(X.shape[0], 1)
-            X = np.hstack(intercept, X)
+        X = self.parse_X(X)
 
         if sample_weights:
             coefs = sample_weights
@@ -129,10 +126,68 @@ class LogisticRegression(Model):
         return self
 
     def predict(self, X):
-        scores = np.dot(X, self.coefs)
-        hypothesis = sigmoid(scores)
+        X = self.parse_X(X)
+        hypothesis = np.array(sigmoid(np.dot(X, self.coefs)))
 
         return np.round(hypothesis)
 
     def score(self, X, y):
-        return np.sum(self.predict(X) == y) / len(y)
+        return np.mean(self.predict(X) == y)
+
+class LogisticRegression(LinearMixin, Model):
+
+    def __init__(self, penalty='l2', learning_rate=0.001, iterations=100, tolerance=0.0001, fit_intercept=False, sample_weights=None):
+        self.learning_rate = learning_rate
+        self.iterations = iterations
+        self.tolerance = tolerance
+        self.fit_intercept = fit_intercept
+        self.coefs = sample_weights
+
+    def fit(self, X, y, sample_weights=None):
+        X = self.parse_X(X)
+        length = len(y)
+
+        if sample_weights:
+            coefs = sample_weights
+        elif not self.coefs:
+            coefs = np.zeros((X.shape[1], 1))
+        else:
+            coefs = self.coefs
+
+        likelihood_delta = 0
+        old_likelihood = self.log_likelihood(X, y, coefs)
+        for i in range(self.iterations):
+
+            scores = np.array(sigmoid(X.dot(coefs)))
+            weights = scores * (1 - scores)
+            print(weights[:, 0])
+            gradient = X.T.dot(y - scores)
+            hessian = (-X).T.dot(weights[:, 0]).dot(X)
+
+            coefs[:, 0] -= step
+
+            likelihood = self.log_likelihood(X, y, coefs)
+            likelihood_delta = old_likelihood - likelihood
+            old_likelihood = likelihood
+
+            print(likelihood)
+            if abs(likelihood_delta) < self.tolerance:
+                print("Converges at %d" % i)
+                break
+
+        self.coefs = coefs
+
+        return self
+
+    def log_likelihood(self, X, y, coefs):
+        hypothesis = sigmoid(X.dot(coefs))
+        return -np.sum(y * np.log(hypothesis) + (1 - y) * np.log(1 - hypothesis)) / len(y)
+
+    def predict(self, X):
+        X = self.parse_X(X)
+        hypothesis = np.array(sigmoid(np.dot(X, self.coefs)))
+
+        return np.round(hypothesis)
+
+    def score(self, X, y):
+        return np.mean(self.predict(X) == y)

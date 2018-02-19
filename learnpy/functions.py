@@ -17,13 +17,35 @@ import numpy as np
 
 def sigmoid(X, derivative=False):
     if derivative == True:
-        return np.exp(-(X)) / (1 + np.exp(-(X))) ** 2
+        return np.exp(-(X)) / (1.0 + np.exp(-(X))) ** 2
     else:
-        return 1 / (1 + np.exp(-(X)))
+        return 1.0 / (1.0 + np.exp(-(X)))
+
+
+def relu(X, derivative=False):
+    if derivative == True:
+        return np.where(X > 0, 1, 0)
+    else:
+        return np.where(X > 0, X, 0)
+
+def elu(X, derivative=False):
+    if derivative == True:
+        return np.where(X >= 0, 1, np.exp(X))
+    else:
+        return np.where(X >= 0, X, np.exp(X) - 1)
+
+
+def tanh(X, derivative=False):
+    if derivative:
+        return 4.0 / ( (np.exp(-X) + np.exp(X)) ** 2)
+    else:
+        return (np.exp(2 * X) - 1.0) / (np.exp(2 * X) + 1.0)
+
 
 def logit(function, X):
     val = function(X)
     return np.log(val / 1 - val)
+
 
 def step_gradient(X, y, thetas, alpha, hypothesis_function=None):
     _thetas = []
@@ -38,8 +60,10 @@ def step_gradient(X, y, thetas, alpha, hypothesis_function=None):
 
     return _thetas
 
+
 def squared_error(y_orig, y_line):
     return np.sum((y_orig - y_line) ** 2)
+
 
 def coefficient_of_determination(y_orig, y_line):
     mean = np.mean(y_orig)
