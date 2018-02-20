@@ -28,6 +28,7 @@ def relu(X, derivative=False):
     else:
         return np.where(X > 0, X, 0)
 
+
 def elu(X, derivative=False):
     if derivative == True:
         return np.where(X >= 0, 1, np.exp(X))
@@ -40,6 +41,24 @@ def tanh(X, derivative=False):
         return 4.0 / ( (np.exp(-X) + np.exp(X)) ** 2)
     else:
         return (np.exp(2 * X) - 1.0) / (np.exp(2 * X) + 1.0)
+
+
+def quadratic_cost(hypothesis, y, derivative=False):
+    if derivative == True:
+        return (hypothesis - y)
+    else:
+        return 0.5 * ((hypothesis - y) ** 2)
+
+
+def cross_entropy_cost(hypothesis, y, derivative=False):
+    if derivative == True:
+        return -(y / hypothesis)
+    else:
+        return -(y * np.log(hypothesis))
+    # if derivative == True:
+        # return (hypothesis - y) / ( (1 - hypothesis) * (hypothesis) )
+    # else:
+        # return -( (y * np.log(hypothesis)) + ( (1 - y) * (np.log(1 - hypothesis)) ) )
 
 
 def logit(function, X):
