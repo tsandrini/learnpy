@@ -1,1 +1,1 @@
-# python-ml
+# LearnPy
